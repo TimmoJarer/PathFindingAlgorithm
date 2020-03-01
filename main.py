@@ -22,6 +22,8 @@ Row6Start = 39
 Row7Start = 47
 Row8Start = 55
 End = 63
+Neighbours = []
+Marker = 0
 
 
 
@@ -116,7 +118,10 @@ XPos = 0
 
 #Lever function declarations
 def get_tile(x,y):
-   return (math.floor(y/100) * 8) + math.ceil(x/100) - 1
+    if(x == 0):
+        return (math.floor(y/100) * 8) + math.ceil(x/100)
+    else:
+        return (math.floor(y/100) * 8) + math.ceil(x/100) - 1
 
 def find_neighbours(x):
     z = x + 1
@@ -144,7 +149,7 @@ def find_neighbours(x):
     #Neighbours = [5, -2, 7, 14]
     n = 0
     for _ in range(len(Neighbours)):
-        if (Neighbours[n] < 0 or Neighbours[n] > 64):
+        if (Neighbours[n] <= 0 or Neighbours[n] > 64):
             del Neighbours[n]
         else:
             n += 1
@@ -160,29 +165,35 @@ def find_neighbours(x):
 def find_neighbouring_paths(x):
     Neighbours = find_neighbours(x)
     n = 0
-    for _ in range(len(Neighbours)):
-        if( Tiles[Neighbours[n]].Path == False):
-            del Neighbours[n]
-        else:
-            n += 1
-    return Neighbours
+    if Tiles[x].Path == False:
+        print('Please choose a valid tile')
+    else:
+        for _ in range(len(Neighbours)):
+            if( Tiles[Neighbours[n]].Path == False):
+                del Neighbours[n]
+            else:
+                n += 1
+        return Neighbours
 
 def find_unmarked_neighbouring_paths(x):
     Neighbours = find_neighbouring_paths(x)
     n = 0
-    for _ in range(len(Neighbours)):
-        if (Tiles[Neighbours[n]].Marked == True):
-            del Neighbours[n]
-        else:
-            n += 1
-    return Neighbours
+    if Tiles[x].Path == False:
+        print('Please choose a valid tile')
+    else:
+        for _ in range(len(Neighbours)):
+            if (Tiles[Neighbours[n]].Marked == True):
+                del Neighbours[n]
+            else:
+                n += 1
+        return Neighbours
 
-def mark_tile(x, y):
-    z = x + 1
-    Tiles[z].Mark = y
+
 
 def find_path(x):
-    print('#')
+    Tiles[x].Marked = True
+    Ns = find_unmarked_neighbouring_paths(x)
+    return Ns
 
 
 Tiles[5].Path = True
@@ -228,9 +239,6 @@ while True:
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            #find_path()
-             # print(find_neighbouring_paths(get_tile(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])))
-            print(find_path(get_tile(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])))
-
+            print(find_path((get_tile(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))))
 
     pygame.display.flip()
